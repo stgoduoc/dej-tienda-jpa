@@ -13,28 +13,15 @@
     <body>
         <div class="container">
             <jsp:include page="/WEB-INF/jspf/menu.jsp" />
+            <jsp:include page="/WEB-INF/jspf/mensajes.jsp" />
 
-            <%-- mensajes --%>
-            <c:if test="${!empty mensajes}">
-                <div class="alert alert-primary" role="alert">
-                    <ul>
-                        <c:forEach items="${mensajes}" var="mensaje">
-                            <li>${mensaje}</li>
-                            </c:forEach>
-                    </ul>
-                </div>
-            </c:if>
 
-            <%-- errores --%>
-            <c:if test="${!empty errores}">
-                <div class="alert alert-danger" role="alert">
-                    <ul>
-                        <c:forEach items="${errores}" var="error">
-                            <li>${error}</li>
-                            </c:forEach>
-                    </ul>
+            <div class="row">
+                <div class="col">
+                    <a href="categorias?op=crear" class="btn btn-success fa fa-plus"> Crear</a>
                 </div>
-            </c:if>
+            </div>
+
 
             <c:if test="${empty categorias}">
                 No hay categorías para mostrar.
@@ -60,7 +47,8 @@
                                     <fmt:formatDate value="${c.fechaCreacion.time}" pattern="dd MMMM yyyy HH:mm'hrs'" />
                                 </td>
                                 <td>
-                                    <form method="get" action="CategoriaEliminarServlet">
+                                    <form method="get" action="categorias">
+                                        <input type="hidden" name="op" value="eliminar" />
                                         <input type="hidden" name="id" value="${c.id}" />
                                         <button type="submit" class="btn btn-danger">Eliminar</button>
                                     </form>

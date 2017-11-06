@@ -2,6 +2,7 @@ package cl.duoc.dej.veterinaria.controller;
 
 import cl.duoc.dej.veterinaria.entity.Categoria;
 import cl.duoc.dej.veterinaria.entity.Producto;
+import cl.duoc.dej.veterinaria.exception.CategoriaNoEncontradaException;
 import cl.duoc.dej.veterinaria.exception.ProductoNoEncontradoException;
 import cl.duoc.dej.veterinaria.service.CategoriaService;
 import cl.duoc.dej.veterinaria.service.ProductoService;
@@ -26,6 +27,7 @@ public class ProductoServlet extends HttpServlet {
     CategoriaService categoriaService;
 
     private final String JSP_LISTA_PRODUCTOS = "/WEB-INF/jsp/producto/listar.jsp";
+    private final String JSP_CREAR = "/WEB-INF/jsp/producto/crear.jsp";
     Logger logger = Logger.getLogger(this.getClass().getSimpleName());
 
     @Override
@@ -33,6 +35,10 @@ public class ProductoServlet extends HttpServlet {
         String operacion = request.getParameter("op");
         operacion = operacion != null ? operacion : "";
         switch (operacion) {
+            case "crear":
+                request.setAttribute("categorias", categoriaService.getCategorias());
+                request.getRequestDispatcher(JSP_CREAR).forward(request, response);
+                break;
             case "buscar":
                 buscar(request, response);
                 break;
@@ -99,6 +105,40 @@ public class ProductoServlet extends HttpServlet {
         }
         List<Producto> productos = productoService.buscarProducto(productoBuscado, categoriaId);
         listar(request, response, productos);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        List<String> errores = new ArrayList<>();
+        List<String> mensajes = new ArrayList<>();
+        String error = "";
+        String mensaje = "";
+        
+        String nombre = request.getParameter("producto");
+        String stringCategoria = request.getParameter("categoria");
+        String stringPrecio = request.getParameter("precio");
+        String imagen = request.getParameter("imagen");
+        String descripcion = request.getParameter("descripcion");
+        Long precio = 0L;
+        Categoria categoria = null;
+        try {
+            Long categoriaId = Long.parseLong(stringCategoria);
+            categoria = categoriaService.getCategoriaById(categoriaId);
+            if(categoria == null) throw new CategoriaNoEncontradaException("No se encontró la categoría asignada al producto");
+            precio = Long.parseLong(stringPrecio);
+            Producto producto = new Producto(nombre, imagen, descripcion, precio, categoria);
+            producto = productoService.crearProducto(producto);
+            mensaje = String.format("Producto %s creada correctamente con ID %s", producto.getNombre(), producto.getId());
+            mensajes.add(mensaje);
+        } catch(NumberFormatException nfe) {
+            errores.add("Formato numérico incompatible");
+        } catch (CategoriaNoEncontradaException ex) {
+            errores.add(ex.getMessage());
+        }
+        
+        request.setAttribute("errores", errores);
+        request.setAttribute("mensajes", mensajes);
+        request.getRequestDispatcher(JSP_CREAR).forward(request, response);
     }
 
 }

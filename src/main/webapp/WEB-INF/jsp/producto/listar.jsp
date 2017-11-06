@@ -40,28 +40,14 @@
             <!-- END formulario de búsqueda -->
 
 
-            <%-- mensajes --%>
-            <c:if test="${!empty mensajes}">
-                <div class="alert alert-primary" role="alert">
-                    <ul>
-                        <c:forEach items="${mensajes}" var="mensaje">
-                            <li>${mensaje}</li>
-                            </c:forEach>
-                    </ul>
-                </div>
-            </c:if>
+            <jsp:include page="/WEB-INF/jspf/mensajes.jsp" />
 
-            <%-- errores --%>
-            <c:if test="${!empty errores}">
-                <div class="alert alert-danger" role="alert">
-                    <ul>
-                        <c:forEach items="${errores}" var="error">
-                            <li>${error}</li>
-                            </c:forEach>
-                    </ul>
+            <div class="row">
+                <div class="col">
+                    <a href="catalogo?op=crear" class="btn btn-success fa fa-plus"> Crear</a>
                 </div>
-            </c:if>
-
+            </div>
+            
             <c:if test="${empty productos}">
                 No hay productos para mostrar.
             </c:if>            
